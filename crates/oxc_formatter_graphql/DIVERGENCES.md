@@ -141,3 +141,31 @@ type A implements B { # c
 ```
 
 Prettier's attachment scatters the comment to the line end, across `implements B {`; same class: `f(x) # c` + break + `: T` is pulled inside the parens (`x # c` before the `)`), user content crossed in both.
+
+## empty-selection-set-comments
+
+- Why: invariant (prettier/prettier#20502)
+- Pin: `tests/fixtures/graphql/empty-selection-set.graphql`
+
+```graphql
+# input
+query {
+  c {
+    # s1
+  }
+}
+
+# ours
+query {
+  c {
+    # s1
+  }
+}
+
+# prettier
+Error: Comment "s1" was not printed. Please report this error!
+```
+
+A selection set may be empty since graphql-js 17 (graphql/graphql-spec#1227);
+Prettier prints an empty one as `{}` and drops (then rejects) the comments inside it.
+They print as dangling comments, as in an empty list or object value.

@@ -26,7 +26,7 @@ pub(super) fn write_selection_set<'a>(
 
     write!(f, "{");
     if selections.is_empty() {
-        // Grammar requires at least one selection; reachable only defensively.
+        // `{}` since graphql-js 17; its comments print dangling (DIVERGENCES.md#empty-selection-set-comments)
         common::write_empty_delimited(r_curly, "}", f);
         return;
     }
