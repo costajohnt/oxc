@@ -1739,16 +1739,19 @@ impl<'a> FormatWrite<'a> for AstNode<'_, 'a, TSInterfaceBody<'a>> {
 
 impl<'a> FormatWrite<'a> for AstNode<'_, 'a, TSPropertySignature<'a>> {
     fn write(&self, f: &mut JsFormatter<'_, 'a>) {
-        if self.readonly() {
-            write!(f, ["readonly", space()]);
-        }
-        format_property_key(&self.key(), self.computed(), f);
-        if self.optional() {
-            write!(f, "?");
-        }
-        if let Some(type_annotation) = &self.type_annotation() {
-            write!(f, type_annotation);
-        }
+        // A group of its own, or the member list's break puts a comment after `:` on its own line
+        // (`a: /** c */\n B` -> `a: /** c */ B`), as in a variable's type annotation
+        let content = format_with(|f| {
+            if self.readonly() {
+                write!(f, ["readonly", space()]);
+            }
+            format_property_key(&self.key(), self.computed(), f);
+            if self.optional() {
+                write!(f, "?");
+            }
+            write!(f, self.type_annotation());
+        });
+        write!(f, group(&content));
     }
 }
 

@@ -200,13 +200,16 @@ impl<'a> FormatWrite<'a> for AstNode<'_, 'a, TSIndexSignature<'a>> {
             write!(f, ["readonly", space()]);
         }
         let is_class = matches!(self.parent(), AstNodes::ClassBody(_));
+        // A group of its own, as `TSPropertySignature`
         write!(
             f,
             [
-                "[",
-                group(&soft_block_indent(&self.parameter())),
-                "]",
-                self.type_annotation(),
+                group(&format_args!(
+                    "[",
+                    group(&soft_block_indent(&self.parameter())),
+                    "]",
+                    self.type_annotation()
+                )),
                 is_class.then_some(OptionalSemicolon)
             ]
         );
